@@ -1,8 +1,8 @@
+datasets
+einops
+matplotlib
 numpy
 pandas
-matplotlib
 torch
-torchvision
 torchaudio
-einops
-datasets
+torchvision
