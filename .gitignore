@@ -1,0 +1,4 @@
+*.jpg
+models/test.py
+models/__pycache__
+screenshots

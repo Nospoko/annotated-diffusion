@@ -1,0 +1,8 @@
+datasets
+einops
+matplotlib
+numpy
+pandas
+torch
+torchaudio
+torchvision
