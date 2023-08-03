@@ -1,4 +1,4 @@
 *.jpg
-models/test.py
+models/tests
 models/__pycache__
 screenshots
