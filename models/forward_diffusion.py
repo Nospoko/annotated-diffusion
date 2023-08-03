@@ -20,7 +20,7 @@ class ForwardDiffusion(nn.Module):
         alphas_cumprod_prev = F.pad(alphas_cumprod[:-1], (1, 0), value=1.0)
 
         # diffusion
-        self.register_buffer("sqrt_alphas_cumprod", alphas_cumprod ** 0.5)
+        self.register_buffer("sqrt_alphas_cumprod", alphas_cumprod**0.5)
         self.register_buffer("sqrt_one_minus_alphas_cumprod", (1.0 - alphas_cumprod) ** 0.5)
 
         posterior_variance = betas * (1.0 - alphas_cumprod_prev) / (1.0 - alphas_cumprod)
@@ -42,7 +42,7 @@ class ForwardDiffusion(nn.Module):
             return torch.linspace(self.beta_start, self.beta_end, self.timesteps)
 
         def quadratic_beta_schedule():
-            return torch.linspace(self.beta_start ** 0.5, self.beta_end ** 0.5, self.timesteps) ** 2
+            return torch.linspace(self.beta_start**0.5, self.beta_end**0.5, self.timesteps) ** 2
 
         def sigmoid_beta_schedule():
             betas = torch.linspace(-6, 6, self.timesteps)
