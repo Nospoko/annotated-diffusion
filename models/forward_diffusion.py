@@ -22,11 +22,11 @@ class ForwardDiffusion(nn.Module):
         alphas_cumprod = torch.cumprod(alphas, dim=0)
         alphas_cumprod_prev = F.pad(alphas_cumprod[:-1], (1, 0), value=1.0)
 
-        sqrt_recip_alphas = (1. / alphas) ** 0.5
+        sqrt_recip_alphas = (1.0 / alphas) ** 0.5
         self.register_buffer("sqrt_recip_alphas", sqrt_recip_alphas)
 
         # diffusion
-        self.register_buffer("sqrt_alphas_cumprod", alphas_cumprod ** 0.5)
+        self.register_buffer("sqrt_alphas_cumprod", alphas_cumprod**0.5)
         self.register_buffer("sqrt_one_minus_alphas_cumprod", (1.0 - alphas_cumprod) ** 0.5)
 
         posterior_variance = betas * (1.0 - alphas_cumprod_prev) / (1.0 - alphas_cumprod)

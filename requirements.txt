@@ -3,6 +3,7 @@ einops
 matplotlib
 numpy
 pandas
+pytorch_lightning
 torch
 torchaudio
 torchvision

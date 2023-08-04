@@ -6,13 +6,7 @@ import torchvision.transforms as T
 
 class Transforms:
     def __init__(self, img_size: int):
-        self.i2t = T.Compose(
-            [
-                T.ToTensor(), 
-                T.Resize((img_size, img_size)), 
-                T.Lambda(lambda t: 2 * t - 1)
-            ]
-        )
+        self.i2t = T.Compose([T.ToTensor(), T.Resize((img_size, img_size)), T.Lambda(lambda t: 2 * t - 1)])
         self.t2i = T.Compose(
             [
                 T.Lambda(lambda t: (t + 1) / 2),

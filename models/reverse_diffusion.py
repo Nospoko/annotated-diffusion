@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 from models.modules.embedding import SinusoidalPositionEmbeddings
-from models.modules.conv_layers import Upsample, Downsample, Residual, PreNorm, ResnetBlock
 from models.modules.attention_layers import ConvAttention, LinearAttention
+from models.modules.conv_layers import PreNorm, Residual, Upsample, Downsample, ResnetBlock
 
 
 class Unet(nn.Module):
@@ -21,10 +21,7 @@ class Unet(nn.Module):
 
         # module for time processing
         self.time_mlp = nn.Sequential(
-            SinusoidalPositionEmbeddings(dim),
-            nn.Linear(dim, self.time_dim),
-            nn.GELU(),
-            nn.Linear(self.time_dim, self.time_dim)
+            SinusoidalPositionEmbeddings(dim), nn.Linear(dim, self.time_dim), nn.GELU(), nn.Linear(self.time_dim, self.time_dim)
         )
 
         self.resnet_block_groups = resnet_block_groups
@@ -38,9 +35,7 @@ class Unet(nn.Module):
         # middle blocks
         mid_dim = dims[-1]
         self.mid_block_1 = ResnetBlock(mid_dim, mid_dim, time_emb_dim=self.time_dim)
-        self.mid_attn = Residual(
-                PreNorm(mid_dim, ConvAttention(mid_dim))
-        )
+        self.mid_attn = Residual(PreNorm(mid_dim, ConvAttention(mid_dim)))
         self.mid_block_2 = ResnetBlock(mid_dim, mid_dim, time_emb_dim=self.time_dim)
 
         # up blocks
@@ -54,24 +49,21 @@ class Unet(nn.Module):
         down = nn.ModuleList([])
 
         for idx, (ins, outs) in enumerate(self.ins_outs):
-            is_last = idx >= (self.num_resolutions -1)
+            is_last = idx >= (self.num_resolutions - 1)
 
             down.append(
                 nn.ModuleList(
                     [
                         ResnetBlock(ins, ins, time_emb_dim=self.time_dim, groups=self.resnet_block_groups),
                         ResnetBlock(ins, ins, time_emb_dim=self.time_dim, groups=self.resnet_block_groups),
-                        Residual(
-                            PreNorm(ins, LinearAttention(ins))
-                        ),
-                        Downsample(ins, outs) if not is_last else nn.Conv2d(ins, outs, kernel_size=3, padding=1)
+                        Residual(PreNorm(ins, LinearAttention(ins))),
+                        Downsample(ins, outs) if not is_last else nn.Conv2d(ins, outs, kernel_size=3, padding=1),
                     ]
                 )
             )
 
-        
         return down
-    
+
     def _build_up_architecture(self) -> nn.ModuleList:
         up = nn.ModuleList([])
 
@@ -83,10 +75,8 @@ class Unet(nn.Module):
                     [
                         ResnetBlock(outs + ins, outs, time_emb_dim=self.time_dim, groups=self.resnet_block_groups),
                         ResnetBlock(outs + ins, outs, time_emb_dim=self.time_dim, groups=self.resnet_block_groups),
-                        Residual(
-                            PreNorm(outs, LinearAttention(outs))
-                        ),
-                        Upsample(outs, ins) if not is_last else nn.Conv2d(outs, ins, kernel_size=3, padding=1)
+                        Residual(PreNorm(outs, LinearAttention(outs))),
+                        Upsample(outs, ins) if not is_last else nn.Conv2d(outs, ins, kernel_size=3, padding=1),
                     ]
                 )
             )
@@ -100,7 +90,6 @@ class Unet(nn.Module):
         # initial
         x = self.init_conv(x)
         r = x.clone()
-
 
         # list for storing residual connections in UNet
         residual_connections = []
@@ -138,7 +127,8 @@ class Unet(nn.Module):
         x = self.final_resnet_block(x, t_emb)
 
         return self.final_conv(x)
-    
+
+
 if __name__ == "__main__":
     x = torch.randn((1, 3, 128, 128))
     t = torch.tensor([100], dtype=torch.long)

@@ -1,11 +1,12 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import einops
-from einops.layers.torch import Rearrange
-
 from functools import partial
 from inspect import isfunction
+
+import torch
+import einops
+import torch.nn as nn
+import torch.nn.functional as F
+from einops.layers.torch import Rearrange
+
 
 def exists(x):
     return x is not None
@@ -57,7 +58,7 @@ class WeightStandardizedConv2d(nn.Conv2d):
         epsilon = 1e-5 if x.dtype == torch.float32 else 1e-3
 
         mu = einops.reduce(self.weight, "c ... -> c 1 1 1", "mean")
-        sigma = einops.reduce(self.weight, "c ... -> c 1 1 1", partial(torch.std, unbiased = False))
+        sigma = einops.reduce(self.weight, "c ... -> c 1 1 1", partial(torch.std, unbiased=False))
 
         normalized_weight = (self.weight - mu) / (sigma + epsilon)
 
@@ -71,7 +72,6 @@ class Block(nn.Module):
         self.conv = WeightStandardizedConv2d(in_dim, out_dim, kernel_size=3, padding=1)
         self.norm = nn.GroupNorm(num_groups=groups, num_channels=out_dim)
         self.act = nn.SiLU()
-
 
     def forward(self, x: torch.Tensor, scale_shift: tuple[torch.Tensor, torch.Tensor] = None) -> torch.Tensor:
         x = self.conv(x)
@@ -90,26 +90,18 @@ class ResnetBlock(nn.Module):
     def __init__(self, in_dim: int, out_dim: int, *, time_emb_dim: int = None, groups: int = 8):
         super().__init__()
 
-        self.time_proj = (
-            nn.Sequential(
-                nn.SiLU(), 
-                nn.Linear(time_emb_dim, out_dim * 2)
-            )
-            if exists(time_emb_dim) else
-            None
-        )
+        self.time_proj = nn.Sequential(nn.SiLU(), nn.Linear(time_emb_dim, out_dim * 2)) if exists(time_emb_dim) else None
 
         self.block_1 = Block(in_dim, out_dim, groups=groups)
         self.block_2 = Block(out_dim, out_dim, groups=groups)
         self.res_conv = nn.Conv2d(in_dim, out_dim, kernel_size=1) if in_dim != out_dim else nn.Identity()
 
     def forward(self, x: torch.Tensor, t_emb: torch.Tensor = None):
-        
         if exists(self.time_proj) and exists(t_emb):
             t_emb = self.time_proj(t_emb)
             t_emb = einops.rearrange(t_emb, "b c -> b c 1 1")
             scale_shift = t_emb.chunk(2, dim=1)
-        
+
         h = self.block_1(x, scale_shift=scale_shift)
         h = self.block_2(h)
 

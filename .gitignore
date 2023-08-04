@@ -2,6 +2,6 @@
 tests
 *__pycache__*
 screenshots
-checkpoints
-logs
+checkpoints/*
+logs/*
 .env
