@@ -55,12 +55,13 @@ class PreNorm(nn.Module):
 
 class WeightStandardizedConv2d(nn.Conv2d):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        epsilon = 1e-5 if x.dtype == torch.float32 else 1e-3
+        eps = 1e-5 if x.dtype == torch.float32 else 1e-3
 
-        mu = einops.reduce(self.weight, "c ... -> c 1 1 1", "mean")
-        sigma = einops.reduce(self.weight, "c ... -> c 1 1 1", partial(torch.std, unbiased=False))
+        weight = self.weight
+        mean = einops.reduce(weight, "o ... -> o 1 1 1", "mean")
+        var = einops.reduce(weight, "o ... -> o 1 1 1", partial(torch.var, unbiased=False))
 
-        normalized_weight = (self.weight - mu) / (sigma + epsilon)
+        normalized_weight = (weight - mean) * (var + eps).rsqrt()
 
         return F.conv2d(x, normalized_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
 

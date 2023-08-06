@@ -126,13 +126,6 @@ class Unet(nn.Module):
 
         x = self.final_resnet_block(x, t_emb)
 
-        return self.final_conv(x)
+        x = self.final_conv(x)
 
-
-if __name__ == "__main__":
-    x = torch.randn((1, 3, 128, 128))
-    t = torch.tensor([100], dtype=torch.long)
-
-    model = Unet(32, (1, 2, 4))
-
-    print(model(x, t).shape)
+        return x

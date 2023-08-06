@@ -29,7 +29,7 @@ class Generator:
             sqrt_recip_alphas_t = self.forward_diffusion.sqrt_recip_alphas[t][:, None, None, None]
             posterior_variance_t = self.forward_diffusion.posterior_variance[t][:, None, None, None]
 
-            if i == 0:
+            if i > 1:
                 noise = torch.randn_like(x)
             else:
                 noise = torch.zeros_like(x)

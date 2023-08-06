@@ -1,5 +1,6 @@
 datasets
 einops
+hydra
 matplotlib
 numpy
 pandas
@@ -7,3 +8,4 @@ pytorch_lightning
 torch
 torchaudio
 torchvision
+wandb
