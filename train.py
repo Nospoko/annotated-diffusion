@@ -124,7 +124,9 @@ def makedir_if_not_exists(dir: str):
 def train(cfg: Config):
     # get dataloader
     dataloader = preprocess_dataset(
-        cfg.hyperparameters.dataset, batch_size=cfg.hyperparameters.batch_size, num_workers=cfg.hyperparameters.num_workers
+        filepath=cfg.hyperparameters.dataset,
+        batch_size=cfg.hyperparameters.batch_size,
+        num_workers=cfg.hyperparameters.num_workers,
     )
 
     # generate some random id for the run
