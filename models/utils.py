@@ -9,6 +9,7 @@ class Transforms:
         self.i2t = T.Compose([T.ToTensor(), T.Resize((img_size, img_size)), T.Lambda(lambda t: 2 * t - 1)])
         self.t2i = T.Compose(
             [
+                T.Lambda(lambda t: torch.clip(t, min=-1, max=1)),
                 T.Lambda(lambda t: (t + 1) / 2),
                 T.Lambda(lambda t: t.permute(1, 2, 0)),
                 T.Lambda(lambda t: t * 255),

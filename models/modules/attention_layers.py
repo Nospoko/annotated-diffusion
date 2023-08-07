@@ -1,6 +1,7 @@
 import torch
-import torch.nn as nn
 import einops
+import torch.nn as nn
+
 
 class ConvAttention(nn.Module):
     def __init__(self, dim: int, heads: int = 4, dim_head: int = 32):
@@ -14,9 +15,7 @@ class ConvAttention(nn.Module):
     def forward(self, x: torch.Tensor):
         _, _, h, w = x.shape
         qkv = self.to_qkv(x).chunk(3, dim=1)
-        q, k, v = map(
-            lambda t: einops.rearrange(t, "b (h c) x y -> b h c (x y)", h=self.heads), qkv
-        )
+        q, k, v = map(lambda t: einops.rearrange(t, "b (h c) x y -> b h c (x y)", h=self.heads), qkv)
         q = q * self.scale
 
         sim = torch.einsum("b h d i, b h d j -> b h i j", q, k)
@@ -36,17 +35,12 @@ class LinearAttention(nn.Module):
         hidden_dim = dim_head * heads
         self.to_qkv = nn.Conv2d(dim, hidden_dim * 3, 1, bias=False)
 
-        self.to_out = nn.Sequential(
-            nn.Conv2d(hidden_dim, dim, 1), 
-            nn.GroupNorm(1, dim)
-        )
+        self.to_out = nn.Sequential(nn.Conv2d(hidden_dim, dim, 1), nn.GroupNorm(1, dim))
 
     def forward(self, x: torch.Tensor):
         _, _, h, w = x.shape
         qkv = self.to_qkv(x).chunk(3, dim=1)
-        q, k, v = map(
-            lambda t: einops.rearrange(t, "b (h c) x y -> b h c (x y)", h=self.heads), qkv
-        )
+        q, k, v = map(lambda t: einops.rearrange(t, "b (h c) x y -> b h c (x y)", h=self.heads), qkv)
 
         q = q.softmax(dim=-2)
         k = k.softmax(dim=-1)
