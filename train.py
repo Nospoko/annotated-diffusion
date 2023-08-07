@@ -64,7 +64,11 @@ class UnetTrainingWrapper(pl.LightningModule):
         return self.model(x, t)
 
     def configure_optimizers(self) -> optim.Optimizer:
-        optimizer = optim.AdamW(self.model.parameters(), lr=self.hparams["lr"], weight_decay=self.hparams["l2"])
+        optimizer = optim.AdamW(
+          params=self.model.parameters(),
+          lr=self. hparams["lr"],
+          weight_decay=self.hparams["l2"],
+        )
 
         return optimizer
 
