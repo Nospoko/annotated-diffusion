@@ -1,0 +1,33 @@
+hyperparameters:
+  dataset: "mnist" # huggingface dataset
+  batch_size: 256
+  num_workers: 4
+  lr: 3e-4 # weight decay
+  l2: 0.01
+  loss_type: "mse" # loss type: mse, mae, huber
+  num_epochs: 10
+  accelerator: "gpu"
+  precision: 16
+  overfit_batches: 0
+  save_every_n_steps: 100 # how often the model is saved
+
+paths:
+  save_ckpt_dir: "checkpoints" # directory where checkpoints will be saved
+  load_ckpt_path: null # if not None, specifies path to model state dict which will be loaded
+  log_dir: "logs"
+
+models:
+  unet:
+    dim: 32 # initial number of unet channels (will be multiplied by dim_mults)
+    dim_mults: [1, 2, 4]
+    in_channels: 1 # image channels
+    num_resnet_groups: 4
+  forward_diffusion:
+    beta_start: 0.0001
+    beta_end: 0.02
+    timesteps: 256
+    schedule_type: "cosine" # schedule type: cosine, linear, quadratic, sigmoid
+
+logger:
+  run_name: "mnist"
+  log_every_n_steps: 50
