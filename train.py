@@ -97,8 +97,8 @@ class UnetTrainingWrapper(pl.LightningModule):
         return loss
 
 
-def preprocess_dataset(filepath: str, batch_size: int, num_workers: int):
-    dataset = load_dataset(filepath)
+def preprocess_dataset(dataset_name: str, batch_size: int, num_workers: int):
+    dataset = load_dataset(dataset_name)
     transformed_dataset = dataset.with_transform(transforms).remove_columns("label")
 
     dataloader = DataLoader(transformed_dataset["train"], batch_size=batch_size, num_workers=num_workers)
