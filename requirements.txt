@@ -1,6 +1,6 @@
 datasets
 einops
-hydra
+hydra-core
 matplotlib
 numpy
 pandas
