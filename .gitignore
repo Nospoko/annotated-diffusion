@@ -1,7 +1,6 @@
 *.jpg
 tests
 *__pycache__*
-screenshots
 checkpoints/*
 logs/*
 .env
